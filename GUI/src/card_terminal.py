@@ -26,6 +26,12 @@ class WindowClass(QMainWindow, from_class):
         self.recv.start()
         # Recognize Tag
         self.recv.detected_signal.connect(self.detected)
+        # Get Total
+        self.recv.getTotal_signal.connect(self.recvTotal)
+        # Set Total
+        self.recv.setTotal_signal.connect(self.changedTotal)
+        # No card
+        self.recv.noCard_signal.connect(self.noCard)
         
         # Button connect
         self.button_init()
@@ -56,12 +62,15 @@ class WindowClass(QMainWindow, from_class):
         self.send(b"GS")
         return
     
+    
     def detected(self, uid):
         print("detected")
         self.uid = uid
         self.timer.stop()
-        self.enable(0)
+        self.getTotal()
+        self.resetButton.setDisabled(False)
         return
+    
     
     def getTotal(self):
         print("getTotal")
@@ -69,25 +78,60 @@ class WindowClass(QMainWindow, from_class):
         return
     
     
+    def recvTotal(self, total):
+        print("GUI > Print total success")
+        self.enable(total)
+    
+    
     def setTotal(self, total):
         print("setTotal")
         self.send(b"ST", total)
         return
     
+    def changedTotal(self):
+        self.getTotal()
+        return
     
     def reset(self):
-        print("reset")
+        print("GUI > Reset button clicked")
+        self.setTotal(0)
         return
 
 
     def charge(self):
-        print("charge")
+        total = int(self.totalLabel.text())
+        charge = int(self.chargeEdit.text())
+        print("GUI > Charge button clicked")
+        self.send(b"ST", total + charge)
+        self.chargeEdit.setText("")
         return
 
 
     def payment(self):
-        print("payment")
+        print("GUI > Payment button clicked")
+        total = int(self.totalLabel.text())
+        payment = int(self.paymentEdit.text())
+        
+        if (total < payment):
+            QMessageBox.warning(self, 'Arduino Manager', '잔액이 부족합니다.')
+            self.paymentEdit.setText("")
+        else:
+            total = total - payment
+            self.setTotal(total)
+            self.paymentEdit.setText("")
+        
         return
+
+
+    def noCard(self):
+        print("GUI > No card !")
+        if (self.timer.isActive() == False):
+            # Restart "GS" Timer
+            print("Start Timer")
+            self.timer.start()
+            
+            self.disable()
+            return
 
 
     def enable(self, total):
