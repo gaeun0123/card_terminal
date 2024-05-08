@@ -102,6 +102,9 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QPushButton" name="chargeButton">
     <property name="geometry">
@@ -150,6 +153,9 @@
       <width>191</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="paymentButton">
